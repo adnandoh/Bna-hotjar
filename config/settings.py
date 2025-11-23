@@ -27,7 +27,19 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-ufk^_$!wx3=#d6irhm7)x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'web-production-dd918.up.railway.app,localhost,127.0.0.1').split(',')
+
+# CSRF & CORS Configuration
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-dd918.up.railway.app',
+    'http://localhost:5173',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'https://web-production-dd918.up.railway.app',
+    'http://localhost:5173',
+]
+CORS_ALLOW_ALL_ORIGINS = True  # Keep true for dev, but above list is for explicit support
 
 
 # Application definition
