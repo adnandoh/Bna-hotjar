@@ -33,11 +33,13 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'web-production-dd918.up.railway
 CSRF_TRUSTED_ORIGINS = [
     'https://web-production-dd918.up.railway.app',
     'http://localhost:5173',
+    'https://hotjar-frontend.vercel.app',
 ]
 
 CORS_ALLOWED_ORIGINS = [
     'https://web-production-dd918.up.railway.app',
     'http://localhost:5173',
+    'https://hotjar-frontend.vercel.app',
 ]
 CORS_ALLOW_ALL_ORIGINS = True  # Keep true for dev, but above list is for explicit support
 
