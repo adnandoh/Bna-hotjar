@@ -15,13 +15,14 @@ def trigger_heatmap_generation(request, site_id):
     device_type = request.data.get('device_type', 'desktop')
     days = request.data.get('days', 7)
     
-    # Trigger Celery task
-    task = generate_heatmap_data.delay(site_id, page_url, heatmap_type, device_type, days)
+    # Trigger task synchronously (Celery removed)
+    # task = generate_heatmap_data.delay(site_id, page_url, heatmap_type, device_type, days)
+    result = generate_heatmap_data(site_id, page_url, heatmap_type, device_type, days)
     
     return Response({
         'status': 'success',
-        'message': 'Heatmap generation started',
-        'task_id': task.id
+        'message': 'Heatmap generation completed',
+        'result': result
     })
 
 

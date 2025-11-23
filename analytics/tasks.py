@@ -1,8 +1,12 @@
-from celery import shared_task
+# from celery import shared_task
 from django.db.models import Count
 from events.models import Event
 from heatmaps.models import HeatmapData
 from datetime import datetime, timedelta
+
+# Dummy decorator if celery is not available
+def shared_task(func):
+    return func
 
 @shared_task
 def generate_heatmap_data(site_id, page_url, heatmap_type='click', device_type='desktop', days=7):
