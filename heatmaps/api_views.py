@@ -26,23 +26,43 @@ def trigger_heatmap_generation(request, site_id):
     })
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def get_tracking_script(request, site_id):
     """
     Generate tracking script for a specific site
     """
     from sites.models import Site
+    from rest_framework_simplejwt.authentication import JWTAuthentication
+    from rest_framework.exceptions import AuthenticationFailed
+    
+    # Manual JWT authentication
+    jwt_auth = JWTAuthentication()
+    try:
+        # Extract and validate JWT token
+        auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+        if not auth_header.startswith('Bearer '):
+            return HttpResponse('// Unauthorized - No token provided', content_type='application/javascript', status=401)
+        
+        # Validate token and get user
+        validated_token = jwt_auth.get_validated_token(auth_header.split(' ')[1])
+        user = jwt_auth.get_user(validated_token)
+        
+        if not user or not user.is_authenticated:
+            return HttpResponse('// Unauthorized - Invalid token', content_type='application/javascript', status=401)
+            
+    except (AuthenticationFailed, Exception) as e:
+        return HttpResponse(f'// Unauthorized - {str(e)}', content_type='application/javascript', status=401)
     
     try:
-        site = Site.objects.get(id=site_id, owner=request.user)
+        site = Site.objects.get(id=site_id, owner=user)
+        
+        api_base = request.build_absolute_uri('/api/track')
         
         script = f"""
 (function() {{
     'use strict';
     const BATCH_INTERVAL = 5000;
     const MOUSE_MOVE_THROTTLE = 100;
-    const API_BASE = 'http://localhost:8000/api/track';
+    const API_BASE = '{api_base}';
     const TRACKING_ID = '{site.tracking_id}';
 
     class HotjarClone {{
@@ -172,3 +192,7 @@ def get_tracking_script(request, site_id):
         return HttpResponse(script, content_type='application/javascript')
     except Site.DoesNotExist:
         return HttpResponse('// Site not found', content_type='application/javascript', status=404)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return HttpResponse(f'// Error generating script: {str(e)}', content_type='application/javascript', status=500)
