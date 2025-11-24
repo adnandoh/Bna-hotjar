@@ -31,29 +31,9 @@ def get_tracking_script(request, site_id):
     Generate tracking script for a specific site
     """
     from sites.models import Site
-    from rest_framework_simplejwt.authentication import JWTAuthentication
-    from rest_framework.exceptions import AuthenticationFailed
-    
-    # Manual JWT authentication
-    jwt_auth = JWTAuthentication()
-    try:
-        # Extract and validate JWT token
-        auth_header = request.META.get('HTTP_AUTHORIZATION', '')
-        if not auth_header.startswith('Bearer '):
-            return HttpResponse('// Unauthorized - No token provided', content_type='application/javascript', status=401)
-        
-        # Validate token and get user
-        validated_token = jwt_auth.get_validated_token(auth_header.split(' ')[1])
-        user = jwt_auth.get_user(validated_token)
-        
-        if not user or not user.is_authenticated:
-            return HttpResponse('// Unauthorized - Invalid token', content_type='application/javascript', status=401)
-            
-    except (AuthenticationFailed, Exception) as e:
-        return HttpResponse(f'// Unauthorized - {str(e)}', content_type='application/javascript', status=401)
     
     try:
-        site = Site.objects.get(id=site_id, owner=user)
+        site = Site.objects.get(id=site_id)
         
         api_base = request.build_absolute_uri('/api/track')
         
