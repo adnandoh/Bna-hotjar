@@ -26,6 +26,9 @@ def trigger_heatmap_generation(request, site_id):
     })
 
 
+
+@api_view(['GET'])
+@permission_classes([])  # Allow unauthenticated access
 def get_tracking_script(request, site_id):
     """
     Generate tracking script for a specific site
@@ -69,8 +72,8 @@ def get_tracking_script(request, site_id):
                     body: JSON.stringify({{
                         tracking_id: this.trackingId,
                         device_type: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-                        browser: navigator.userAgent,
-                        os: navigator.platform,
+                        browser: navigator.userAgent.substring(0, 100),
+                        os: navigator.platform.substring(0, 100),
                         viewport: {{ width: window.innerWidth, height: window.innerHeight }}
                     }})
                 }});
